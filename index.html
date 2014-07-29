@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+    <meta name="viewport" content="width=device-width; initial-scale=1.0">
+    <meta name="keywords" content="">
+    <meta name="description" content="瀑布流列表">
+    <title>自适应瀑布流</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script type="text/javascript" src="js/jquery-1.7.min.js"></script>
+    <!--[if IE 8]>
+    <link rel="stylesheet" href="css/ie.css">
+    <script type="text/javascript" src="js/respond.min.js"></script>
+    <script type="text/javascript" src="js/html5.js"></script>
+    <script type="text/javascript" src="js/selectivizr-min.js"></script>
+    <![endif]-->
+    <script type="text/javascript" src="js/jquery.masonry.min.js"></script>
+    <script type="text/javascript">
+      (function() {
+        var init = function() {
+          $('#masonry').masonry({
+            itemSelector: '.show_item',
+            gutterWidth: 20,
+            isAnimated: true,
+            isAnimated: false,
+          });
+        };
+        //给新增元素定位
+        var reSort = function() {
+          $('#masonry').masonry("reload");
+        };
+        var modifyHtml = function(data) {
+          var html = '';
+          for (var i = 0; i < data.length; i++) {
+            html += 
+              '<section class="show_item">' +
+                '<a href="detail.html" class="lk_showpic">'+
+                  '<img src="' + data[i].pic + '" width="230" height="' + data[i].height + '" alt="' + data[i].title + '">' +
+                  '<button type="button" class="btn_gather">加入专辑  </button>' +
+                '</a>' +
+                '<div class="show_op">' +
+                  '<a href="#" title="喜欢" class="lk_gather">6</a>' +
+                '</div>' +
+                '<h3 class="show_title">' +
+                  '<a href="#">' + data[i].title + '</a>' +
+                '</h3>' +
+              '</section>';
+          };
+          return html;
+        };
+        var loadImg = function(callback) {
+          $.ajax({
+             type: "GET",
+             url: "get_pic.php",
+             dataType: "json",
+             success: function(data) {
+                //- console.log(data);
+                if(data.errno === 0) {
+                  $('#masonry').append(modifyHtml(data.body));
+                  callback();
+                } else {
+                  throw '服务器错误';
+                }
+             }
+          });
+        };
+        $(document).ready(function() {
+          loadImg(init);
+        });
+        $(window).scroll(function() {
+          //滚动距离 >= 页面高度 - 窗口高度即为底部
+          if( $(document).scrollTop() >= ($(document).height() - $(window).height()) ) {
+            loadImg(reSort);
+          }
+        });
+      })();
+    </script>
+  </head>
+  <body class="indexpage waterfall">
+    <div class="intro_by_author"> 
+      <p>响应式瀑布流Demo，使用masonry.js完成定位布局 ，通过媒体查询控制wrapper宽度，并适配浏览器窗口变化&缩放。</p>
+      <p class="ieshow">建议使用IE8以上版本浏览器获得更好体验，高版本浏览器将不显示此段文本:）</p>
+    </div>
+    <div id="masonry" class="wrapper">
+      <section class="show_item"><a href="detail.html" class="lk_showpic"><img src="img/1400677171_212452018_m.jpg" width="230" height="230" alt="">
+          <button type="button" class="btn_gather">加入专辑  </button></a>
+        <div class="show_op"><a href="" title="喜欢" class="lk_gather">6</a></div>
+        <h3 class="show_title"><a href="">3D出口全棉水墨立体床上用品四件套</a></h3>
+      </section>
+    </div>
+  </body>
+</html>
